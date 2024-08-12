@@ -3,7 +3,7 @@ import { useRouter } from 'next/router';
 import { getProfile, logoutUser } from '@/services/auth';
 
 const ProfilePage = () => {
-  const [username, setUsername] = useState<string | null>(null);
+  const [profile, setProfile] = useState<any>(null);
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();
 
@@ -13,7 +13,7 @@ const ProfilePage = () => {
       if (token) {
         try {
           const data = await getProfile(token);
-          setUsername(data.username);
+          setProfile(data);
         } catch (err) {
           console.error('Error fetching profile:', err);
           setError('Failed to fetch profile');
@@ -45,9 +45,16 @@ const ProfilePage = () => {
       <div className="bg-white p-8 rounded-lg shadow-md w-full max-w-md">
         <h1 className="text-2xl font-semibold text-center mb-4">Profile</h1>
         {error && <p className="text-red-500 text-center mb-4">{error}</p>}
-        {username ? (
+        {profile ? (
           <div className="text-center">
-            <p className="text-lg">Username: <span className="font-medium">{username}</span></p>
+            <img
+              src={profile.profilePic || '/images/default-img.jpg'}
+              alt="Profile Picture"
+              className="mx-auto mb-4 rounded-full w-24 h-24 object-cover"
+            />
+            <p className="text-lg">Username: <span className="font-medium">{profile.username}</span></p>
+            <p className="text-lg">Email: <span className="font-medium">{profile.email}</span></p>
+            <p className="text-lg">Status: <span className="font-medium">{profile.status}</span></p>
             <button
               onClick={handleLogout}
               className="mt-6 w-full bg-teal-500 text-white py-2 rounded-lg hover:bg-teal-600 transition duration-200"

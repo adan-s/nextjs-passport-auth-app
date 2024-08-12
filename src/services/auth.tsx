@@ -1,15 +1,16 @@
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
 
-export const registerUser = async (username: string, password: string, email: string) => {
+export const registerUser = async (username: string, password: string, email: string, profilePic: string, status: string) => {
   const response = await fetch(`${API_BASE_URL}/auth/register`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
     },
-    body: JSON.stringify({ username, password, email }),
+    body: JSON.stringify({ username, password, email, profilePic, status }),
   });
   return response.json();
 };
+
 
 export const loginUser = async (username: string, password: string) => {
   const response = await fetch(`${API_BASE_URL}/auth/login`, {

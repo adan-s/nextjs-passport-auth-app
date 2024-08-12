@@ -7,13 +7,15 @@ const SignupPage = () => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [email, setEmail] = useState('');
+  const [profilePic, setProfilePic] = useState('');
+  const [status, setStatus] = useState('active');
   const [error, setError] = useState('');
   const router = useRouter();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      const data = await registerUser(username, password, email);
+      const data = await registerUser(username, password, email, profilePic, status);
       if (data.message) {
         setError(data.message);
       } else {
@@ -29,11 +31,10 @@ const SignupPage = () => {
   };
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-black" style={{fontFamily:"Times New Roman"}}>
+    <div className="flex items-center justify-center min-h-screen bg-black" style={{ fontFamily: "Times New Roman" }}>
       <div className="container mx-auto p-4 md:p-6 lg:p-12">
         <main className="flex flex-col items-center justify-center w-full">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-12 w-full max-w-5xl">
-          
             <div className="bg-white rounded-lg shadow-lg overflow-hidden">
               <img src="/images/signup.png" alt="Organic Mind" className="w-full object-cover" />
               <p className="text-center my-6 text-3xl text-teal-500 font-bold py-4">Humanity NeuroTech</p>
@@ -42,6 +43,7 @@ const SignupPage = () => {
               <h2 className="text-4xl font-bold mb-6">Create Your Account</h2>
 
               <form onSubmit={handleSubmit}>
+                {/* Username Field */}
                 <div className="mb-4">
                   <label className="block text-gray-700 text-lg font-bold mb-2" htmlFor="username">
                     Username
@@ -55,6 +57,8 @@ const SignupPage = () => {
                     className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
                   />
                 </div>
+
+                {/* Email Field */}
                 <div className="mb-4">
                   <label className="block text-gray-700 text-lg font-bold mb-2" htmlFor="email">
                     Email
@@ -68,6 +72,8 @@ const SignupPage = () => {
                     className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
                   />
                 </div>
+
+                {/* Password Field */}
                 <div className="mb-6 relative">
                   <label className="block text-gray-700 text-lg font-bold mb-2" htmlFor="password">
                     Password
@@ -81,6 +87,37 @@ const SignupPage = () => {
                     className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
                   />
                 </div>
+
+                {/* Profile Picture Field */}
+                <div className="mb-4">
+                  <label className="block text-gray-700 text-lg font-bold mb-2" htmlFor="profilePic">
+                    Profile Picture URL
+                  </label>
+                  <input
+                    type="text"
+                    id="profilePic"
+                    value={profilePic}
+                    onChange={(e) => setProfilePic(e.target.value)}
+                    className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                  />
+                </div>
+
+                {/* Status Field */}
+                {/* <div className="mb-4">
+                  <label className="block text-gray-700 text-lg font-bold mb-2" htmlFor="status">
+                    Status
+                  </label>
+                  <select
+                    id="status"
+                    value={status}
+                    onChange={(e) => setStatus(e.target.value)}
+                    className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                  >
+                    <option value="active">Active</option>
+                    <option value="inactive">Inactive</option>
+                  </select>
+                </div> */}
+
                 <button
                   type="submit"
                   className="bg-teal-500 hover:bg-teal-700 text-white font-bold py-3 px-5 rounded w-full mb-6 text-lg"
