@@ -47,11 +47,19 @@ const ProfilePage = () => {
         {error && <p className="text-red-500 text-center mb-4">{error}</p>}
         {profile ? (
           <div className="text-center">
-            <img
-              src={profile.profilePic || '/images/default-img.jpg'}
-              alt="Profile Picture"
-              className="mx-auto mb-4 rounded-full w-24 h-24 object-cover"
-            />
+          {profile.profilePic ? (
+              <img
+                src={`http://localhost:8000/uploads/profile-pics/${profile.profilePic}`}
+                alt="Profile Picture"
+                className="w-32 h-32 rounded-full mx-auto mb-4"
+              />
+            ) : (
+              <img
+                src="/images/default-img.jpg"
+                alt="Profile Picture"
+                className="w-32 h-32 rounded-full mx-auto mb-4"
+              />
+            )}
             <p className="text-lg">Username: <span className="font-medium">{profile.username}</span></p>
             <p className="text-lg">Email: <span className="font-medium">{profile.email}</span></p>
             <p className="text-lg">Status: <span className="font-medium">{profile.status}</span></p>
