@@ -50,7 +50,7 @@ const ProfilePage = () => {
             <p className="text-lg">Username: <span className="font-medium">{username}</span></p>
             <button
               onClick={handleLogout}
-              className="mt-6 w-full bg-blue-500 text-white py-2 rounded-lg hover:bg-blue-600 transition duration-200"
+              className="mt-6 w-full bg-teal-500 text-white py-2 rounded-lg hover:bg-teal-600 transition duration-200"
             >
               Logout
             </button>
