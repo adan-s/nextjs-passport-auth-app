@@ -90,6 +90,7 @@ export const changePassword = async (
   currentPassword: string,
   newPassword: string
 ) => {
+  console.log("token and passwords:", token, currentPassword,newPassword)
   const response = await fetch(`${API_BASE_URL}/profile/change-password`, {
     method: "POST",
     headers: {

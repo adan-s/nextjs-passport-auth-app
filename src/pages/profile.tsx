@@ -1,6 +1,11 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
-import { getProfile, logoutUser, updateProfile } from "@/services/auth";
+import {
+  getProfile,
+  logoutUser,
+  updateProfile,
+  changePassword,
+} from "@/services/auth";
 
 const ProfilePage = () => {
   const [profile, setProfile] = useState<any>(null);
@@ -10,6 +15,10 @@ const ProfilePage = () => {
   const [email, setEmail] = useState<string>("");
   const [profilePic, setProfilePic] = useState<File | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState<string | null>(null);
+  const [currentPassword, setCurrentPassword] = useState<string>("");
+  const [newPassword, setNewPassword] = useState<string>("");
+  const [showChangePassword, setShowChangePassword] = useState(false);
   const router = useRouter();
 
   useEffect(() => {
@@ -35,6 +44,54 @@ const ProfilePage = () => {
     fetchProfile();
   }, [router]);
 
+  useEffect(() => {
+    if (success) {
+      const timer = setTimeout(() => {
+        setSuccess(null);
+      }, 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [success]);
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      setProfilePic(e.target.files[0]);
+    }
+  };
+
+  const handlePicEdit = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    const formData = new FormData();
+    formData.append("username", username);
+    formData.append("email", email);
+    formData.append("status", status);
+    if (profilePic) {
+      formData.append("profilePic", profilePic);
+    }
+
+    console.log("updated form data:", profilePic);
+
+    const token = localStorage.getItem("token");
+    if (token) {
+      try {
+        const updatedProfile = {
+          username: username,
+          status: status,
+          email: email,
+          profilePic: profilePic,
+        };
+
+        await updateProfile(token, updatedProfile);
+        setProfile(updatedProfile);
+        setProfilePic(profilePic);
+      } catch (err) {
+        console.error("Error updating PFP:", err);
+        setError("Failed to update PFP");
+      }
+    }
+  };
+
   const handleEditToggle = () => {
     setEditMode(!editMode);
   };
@@ -57,10 +114,6 @@ const ProfilePage = () => {
 
         await updateProfile(token, updatedProfile);
         setProfile(updatedProfile);
-        setUsername(username);
-        setStatus(status);
-        setEmail(email);
-        setProfilePic(profilePic);
         setEditMode(false);
       } catch (err) {
         console.error("Error updating profile:", err);
@@ -69,6 +122,26 @@ const ProfilePage = () => {
     }
   };
 
+  const handleChangePassword = async () => {
+    const token = localStorage.getItem("token");
+    if (!token) return;
+
+    if (newPassword.length < 8) {
+      setError("Password must be at least 8 characters long.");
+      return;
+    }
+
+    const response = await changePassword(token, currentPassword, newPassword);
+
+    if (response.message === "Current password is incorrect") {
+      setError(response.message);
+    } else {
+      setSuccess("Password changed successfully");
+      setCurrentPassword("");
+      setNewPassword("");
+      setShowChangePassword(false);
+    }
+  };
   const handleLogout = async () => {
     const token = localStorage.getItem("token");
     if (token) {
@@ -88,6 +161,9 @@ const ProfilePage = () => {
       <div className="bg-white p-8 rounded-lg shadow-md w-full max-w-md">
         <h1 className="text-2xl font-semibold text-center mb-4">Profile</h1>
         {error && <p className="text-red-500 text-center mb-4">{error}</p>}
+        {success && (
+          <p className="text-green-500 text-center mb-4">{success}</p>
+        )}
         {profile ? (
           <div className="text-center">
             {profile.profilePic ? (
@@ -104,6 +180,29 @@ const ProfilePage = () => {
               />
             )}
 
+            <form onSubmit={handlePicEdit}>
+              <div className="mb-4">
+                <label
+                  className="block text-gray-700 text-lg font-bold mb-2"
+                  htmlFor="profilePic"
+                >
+                  Profile Picture
+                </label>
+                <input
+                  type="file"
+                  id="profilePic"
+                  accept=".png, .jpg, .jpeg"
+                  onChange={handleFileChange}
+                  className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                />
+              </div>
+              <button
+                type="submit"
+                className="bg-teal-500 hover:bg-teal-700 text-white font-bold py-3 px-5 rounded w-full mb-6 text-lg"
+              >
+                Save PFP
+              </button>
+            </form>
             {editMode ? (
               <div>
                 <div className="mb-4">
@@ -156,6 +255,42 @@ const ProfilePage = () => {
                   className="mt-6 w-full bg-blue-500 text-white py-2 rounded-lg hover:bg-blue-600 transition duration-200"
                 >
                   Edit Profile
+                </button>
+              </div>
+            )}
+
+            <button
+              onClick={() => setShowChangePassword(!showChangePassword)}
+              className="mt-6 w-full bg-red-500 text-white py-2 rounded-lg hover:bg-red-600 transition duration-200"
+            >
+              Change Password
+            </button>
+
+            {showChangePassword && (
+              <div className="mt-4">
+                <div className="mb-4">
+                  <label className="block text-left">Current Password</label>
+                  <input
+                    type="password"
+                    value={currentPassword}
+                    onChange={(e) => setCurrentPassword(e.target.value)}
+                    className="w-full px-3 py-2 border rounded-lg"
+                  />
+                </div>
+                <div className="mb-4">
+                  <label className="block text-left">New Password</label>
+                  <input
+                    type="password"
+                    value={newPassword}
+                    onChange={(e) => setNewPassword(e.target.value)}
+                    className="w-full px-3 py-2 border rounded-lg"
+                  />
+                </div>
+                <button
+                  onClick={handleChangePassword}
+                  className="w-full bg-green-500 text-white py-2 rounded-lg hover:bg-green-600 transition duration-200"
+                >
+                  Save New Password
                 </button>
               </div>
             )}
